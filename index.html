@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FIVE Ops</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&family=Roboto+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="manifest" href="manifest.json" />
+  </head>
+  <body>
+    <a class="skip-link" href="#mainArea">Pular para o conteúdo</a>
+    <div id="app" class="app-shell">
+      <header class="app-bar">
+        <div class="app-bar__brand">
+          <div class="brand-logo">
+            <img src="assets/no_background_logo.png" alt="Logotipo FIVE Sport Bar" />
+          </div>
+          <div class="brand-text">
+            <p class="brand-title">FIVE Sport Bar</p>
+            <p class="brand-subtitle">DF Plaza – Operações</p>
+          </div>
+        </div>
+        <div class="app-bar__meta">
+          <p class="app-bar__hint">Fluxo sincronizado para salão, bar e cozinha</p>
+        </div>
+        <div class="app-bar__controls" id="topControls">
+          <div class="status-indicator" id="connectionStatus" aria-live="polite" role="status" data-state="offline">
+            <span class="indicator-dot"></span>
+            <span class="indicator-text">Offline</span>
+          </div>
+          <div class="plantao-switch" role="group" aria-label="Plantão">
+            <button class="chip chip--active" data-plantao="1" aria-pressed="true">Plantão 1</button>
+            <button class="chip" data-plantao="2" aria-pressed="false">Plantão 2</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="app-main" id="mainArea">
+        <section id="loginScreen" class="screen screen--active" aria-label="Login">
+          <div class="panel panel--centered">
+            <h1 class="panel__title">Identificação</h1>
+            <p class="panel__subtitle">Acesse com CPF/Telefone + PIN</p>
+            <form id="loginForm" class="form-grid" autocomplete="on">
+              <label class="form-field">
+                <span>CPF ou Telefone</span>
+                <input
+                  type="text"
+                  id="loginId"
+                  name="loginId"
+                  inputmode="numeric"
+                  placeholder="000.000.000-00"
+                  required
+                />
+              </label>
+              <label class="form-field">
+                <span>PIN</span>
+                <input
+                  type="password"
+                  id="loginPin"
+                  name="loginPin"
+                  inputmode="numeric"
+                  minlength="4"
+                  maxlength="6"
+                  placeholder="••••"
+                  required
+                />
+              </label>
+              <label class="form-field">
+                <span>Setor</span>
+                <select id="loginRole" name="loginRole" required>
+                  <option value="garcom">Garçom</option>
+                  <option value="cozinha">Cozinha</option>
+                  <option value="bar">Bar</option>
+                  <option value="carnes">Praça de Carnes</option>
+                  <option value="gerente">Gerente</option>
+                </select>
+              </label>
+              <label class="form-field">
+                <span>Plantão</span>
+                <select id="loginShift" name="loginShift" required>
+                  <option value="1">Plantão 1</option>
+                  <option value="2">Plantão 2</option>
+                </select>
+              </label>
+              <button type="submit" class="btn btn--primary">Entrar</button>
+            </form>
+            <ul class="panel__tips">
+              <li>Use o CPF completo ou telefone sem formatação.</li>
+              <li>Selecione o setor atual para carregar os fluxos corretos.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section
+          id="dashboardScreen"
+          class="screen"
+          role="tabpanel"
+          aria-labelledby="tab-dashboard"
+          aria-label="Início"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <header class="section-header">
+            <div>
+              <h2>Visão rápida</h2>
+              <p class="text-muted">Plantão <span data-bind="plantao">1</span> • <span data-bind="clock">--:--</span></p>
+            </div>
+            <div class="status-chips">
+              <span class="badge badge--green">Comms ok</span>
+              <span class="badge badge--amber">2 pendências</span>
+            </div>
+          </header>
+          <div class="dashboard-hero" role="region" aria-label="Resumo do plantão">
+            <div class="hero-card hero-card--plantao">
+              <span class="hero-label">Plantão ativo</span>
+              <strong class="hero-value" data-bind="plantaoLabel">Plantão 1</strong>
+            </div>
+            <div class="hero-card hero-card--progress">
+              <span class="hero-label">Produção concluída</span>
+              <strong class="hero-value hero-value--accent"><span data-bind="prodPercent">0</span>%</strong>
+              <div class="hero-bar" role="img" aria-label="0% da produção concluída">
+                <span class="hero-bar__fill" data-bind="prodPercentBar"></span>
+              </div>
+            </div>
+            <div class="hero-card hero-card--alert">
+              <span class="hero-label">Pendências críticas</span>
+              <strong class="hero-value hero-value--warning" data-bind="criticalPendencias">0</strong>
+            </div>
+          </div>
+          <div class="grid grid--cards">
+            <article class="card">
+              <header class="card__header">
+                <h3>Itens críticos hoje</h3>
+                <span class="badge badge--red">3</span>
+              </header>
+              <ul class="list list--dense">
+                <li>Falta insumo: Ancho 300g</li>
+                <li>Atraso: Drink autoral (12 min)</li>
+                <li>Cartão vermelho: Revisar freezer bar</li>
+              </ul>
+              <button class="btn btn--secondary" data-action="listarCriticos">Ver detalhes</button>
+            </article>
+            <article class="card">
+              <header class="card__header">
+                <h3>Produção pendente</h3>
+                <span class="badge badge--amber" data-bind="prodPendentesBadge">5</span>
+              </header>
+              <div class="kpi-line">
+                <span>Total</span>
+                <strong class="kpi-value" data-bind="prodPendentes">5</strong>
+              </div>
+              <button class="btn btn--primary" data-nav="producao">Ir para produção</button>
+            </article>
+            <article class="card">
+              <header class="card__header">
+                <h3>Checklists em aberto</h3>
+                <span class="badge badge--amber">1</span>
+              </header>
+              <p>Fechar plantão Bar</p>
+              <button class="btn btn--primary" data-nav="checklists">Continuar checklist</button>
+            </article>
+          </div>
+          <div class="quick-actions">
+            <button class="btn btn--primary" data-nav="operacoes">Abrir plantão</button>
+            <button class="btn btn--secondary" data-action="listaDia">Lista do dia</button>
+            <button class="btn btn--secondary" data-nav="estoque">Conferir estoque</button>
+          </div>
+        </section>
+
+        <section
+          id="operacoesScreen"
+          class="screen"
+          role="tabpanel"
+          aria-labelledby="tab-operacoes"
+          aria-label="Operações"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <header class="section-header">
+            <div>
+              <h2>Abertura de Plantão</h2>
+              <p class="text-muted">Fluxo em 4 etapas</p>
+            </div>
+            <button class="btn btn--secondary" data-action="fecharFluxo">Fechar plantão</button>
+          </header>
+          <ol class="stepper" id="stepperAbertura">
+            <li class="step step--active" data-step="1">
+              <div class="step__title">Limpeza</div>
+              <div class="step__content">
+                <label class="check-tile">
+                  <input type="checkbox" data-checklist="limpeza" value="pisos" />
+                  <span>Pisos seco e sem resíduos</span>
+                </label>
+                <label class="check-tile">
+                  <input type="checkbox" data-checklist="limpeza" value="sanitizacao" />
+                  <span>Sanitização balcão</span>
+                </label>
+                <button class="btn btn--secondary btn--compact" data-action="marcarSecao" data-section="limpeza">Marcar tudo ok</button>
+              </div>
+            </li>
+            <li class="step" data-step="2">
+              <div class="step__title">Cozinha</div>
+              <div class="step__content">
+                <label class="check-tile">
+                  <input type="checkbox" data-checklist="cozinha" value="insumos" />
+                  <span>Insumos conferidos</span>
+                </label>
+                <label class="check-tile">
+                  <input type="checkbox" data-checklist="cozinha" value="equipamentos" />
+                  <span>Equipamentos aquecidos</span>
+                </label>
+                <button class="btn btn--secondary btn--compact" data-action="marcarSecao" data-section="cozinha">Marcar tudo ok</button>
+              </div>
+            </li>
+            <li class="step" data-step="3">
+              <div class="step__title">Bar</div>
+              <div class="step__content">
+                <label class="check-tile">
+                  <input type="checkbox" data-checklist="bar" value="gelo" />
+                  <span>Gelo reposto</span>
+                </label>
+                <label class="check-tile">
+                  <input type="checkbox" data-checklist="bar" value="mise" />
+                  <span>Mise en place finalizado</span>
+                </label>
+                <button class="btn btn--secondary btn--compact" data-action="marcarSecao" data-section="bar">Marcar tudo ok</button>
+              </div>
+            </li>
+            <li class="step" data-step="4">
+              <div class="step__title">Carnes</div>
+              <div class="step__content">
+                <label class="check-tile">
+                  <input type="checkbox" data-checklist="carnes" value="temperaturas" />
+                  <span>Temperaturas conferidas</span>
+                </label>
+                <label class="check-tile">
+                  <input type="checkbox" data-checklist="carnes" value="cortes" />
+                  <span>Cortes porcionados</span>
+                </label>
+                <button class="btn btn--secondary btn--compact" data-action="marcarSecao" data-section="carnes">Marcar tudo ok</button>
+              </div>
+            </li>
+          </ol>
+          <div class="stepper-actions">
+            <button class="btn btn--secondary" data-action="anterior">Voltar</button>
+            <button class="btn btn--primary" data-action="proximo">Avançar</button>
+          </div>
+        </section>
+
+        <section
+          id="producaoScreen"
+          class="screen"
+          role="tabpanel"
+          aria-labelledby="tab-producao"
+          aria-label="Produção"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <header class="section-header">
+            <div>
+              <h2>Produção do Dia</h2>
+              <p class="text-muted">Toque rápido para atualizar quantidades</p>
+            </div>
+            <div class="status-chips">
+              <div class="chip" data-filter="setor">Cozinha</div>
+              <div class="chip" data-filter="status">Em preparo</div>
+            </div>
+          </header>
+          <ul class="production-list" id="productionList">
+            <li class="production-item" data-status="preparo" data-meta="20">
+              <div>
+                <p class="item-title">Burger Angus</p>
+                <small>Meta: 20 • Produzido: <span data-bind="produzido">12</span></small>
+              </div>
+              <div class="production-actions">
+                <button class="btn btn--small" data-action="decrementar">-</button>
+                <span class="production-qty" data-bind="quantidade">12</span>
+                <button class="btn btn--small" data-action="incrementar">+</button>
+                <button class="btn btn--danger btn--small" data-action="falta">Falta</button>
+                <button class="btn btn--success btn--small" data-action="concluir">Pronto</button>
+              </div>
+            </li>
+            <li class="production-item" data-status="pronto" data-meta="40">
+              <div>
+                <p class="item-title">Dadinho de tapioca</p>
+                <small>Meta: 40 • Produzido: <span data-bind="produzido">40</span></small>
+              </div>
+              <div class="production-actions">
+                <span class="badge badge--green">Pronto</span>
+              </div>
+            </li>
+            <li class="production-item" data-status="falta" data-meta="15">
+              <div>
+                <p class="item-title">Ancho 300g</p>
+                <small>Meta: 15 • Produzido: <span data-bind="produzido">5</span></small>
+              </div>
+              <div class="production-actions">
+                <span class="badge badge--red">Falta insumo</span>
+                <button class="btn btn--secondary btn--small" data-action="notificar">Notificar gerente</button>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <section
+          id="checklistsScreen"
+          class="screen"
+          role="tabpanel"
+          aria-labelledby="tab-checklists"
+          aria-label="Checklists"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <header class="section-header">
+            <div>
+              <h2>Checklists por setor</h2>
+              <p class="text-muted">Tempo médio • Pendências</p>
+            </div>
+            <div class="chip-group" role="group" aria-label="Filtro de setor">
+              <button class="chip chip--active" data-setor="todos">Todos</button>
+              <button class="chip" data-setor="limpeza">Limpeza</button>
+              <button class="chip" data-setor="cozinha">Cozinha</button>
+              <button class="chip" data-setor="bar">Bar</button>
+              <button class="chip" data-setor="carnes">Carnes</button>
+              <button class="chip" data-setor="garcom">Garçom</button>
+            </div>
+          </header>
+          <div class="grid grid--cards">
+            <article class="card card--status">
+              <header class="card__header">
+                <h3>Check limpeza</h3>
+                <span class="badge badge--amber">Em andamento</span>
+              </header>
+              <p>Tempo médio: 6 min</p>
+              <p>Pendências: 1</p>
+              <button class="btn btn--primary" data-action="retomar">Retomar</button>
+            </article>
+            <article class="card card--status">
+              <header class="card__header">
+                <h3>Checklist Bar</h3>
+                <span class="badge badge--green">Concluído</span>
+              </header>
+              <p>Tempo médio: 5 min</p>
+              <p>Pendências: 0</p>
+              <button class="btn btn--secondary" disabled>Finalizado</button>
+            </article>
+            <article class="card card--status">
+              <header class="card__header">
+                <h3>Fechamento Carnes</h3>
+                <span class="badge badge--red">Falta insumo</span>
+              </header>
+              <p>Tempo médio: 4 min</p>
+              <p>Pendências: 2</p>
+              <button class="btn btn--danger" data-action="abrirPendencias">Ver pendências</button>
+            </article>
+          </div>
+        </section>
+
+        <section
+          id="gerenteScreen"
+          class="screen"
+          role="tabpanel"
+          aria-labelledby="tab-gerente"
+          aria-label="Gerente"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <header class="section-header">
+            <div>
+              <h2>Painel do Gerente</h2>
+              <p class="text-muted">Visão 360° por setor</p>
+            </div>
+            <div class="status-chips">
+              <span class="badge badge--green">Cozinha</span>
+              <span class="badge badge--amber">Bar</span>
+              <span class="badge badge--red">Carnes</span>
+            </div>
+          </header>
+          <div class="grid grid--cards">
+            <article class="card">
+              <header class="card__header">
+                <h3>KPIs de plantão</h3>
+              </header>
+              <ul class="list list--dense">
+                <li>Checklists concluídos: <strong>8/10</strong></li>
+                <li>Pendências críticas: <strong>2</strong></li>
+                <li>Itens faltando: <strong>3</strong></li>
+                <li>Produção finalizada: <strong>75%</strong></li>
+              </ul>
+              <div class="btn-bar">
+                <button class="btn btn--primary" data-action="exportar">Exportar resumo</button>
+                <button class="btn btn--secondary" data-action="enviarAviso">Enviar aviso</button>
+              </div>
+            </article>
+            <article class="card">
+              <header class="card__header">
+                <h3>Permissões & usuários</h3>
+              </header>
+              <table class="table table--compact">
+                <thead>
+                  <tr>
+                    <th>Perfil</th>
+                    <th>Editar listas</th>
+                    <th>Relatórios</th>
+                    <th>Fechar plantão</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Garçom</td>
+                    <td><span class="icon-deny">✖</span></td>
+                    <td><span class="icon-deny">✖</span></td>
+                    <td><span class="icon-deny">✖</span></td>
+                  </tr>
+                  <tr>
+                    <td>Cozinha</td>
+                    <td><span class="icon-allow">✔</span></td>
+                    <td><span class="icon-allow">✔</span></td>
+                    <td><span class="icon-deny">✖</span></td>
+                  </tr>
+                  <tr>
+                    <td>Gerente</td>
+                    <td><span class="icon-allow">✔</span></td>
+                    <td><span class="icon-allow">✔</span></td>
+                    <td><span class="icon-allow">✔</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
+            <article class="card card--stretch">
+              <header class="card__header">
+                <h3>Relatórios essenciais</h3>
+              </header>
+              <ul class="list">
+                <li>
+                  <span>Vendas do dia</span>
+                  <button class="btn btn--secondary btn--small" data-action="abrirRelatorio">Abrir</button>
+                </li>
+                <li>
+                  <span>Itens mais pedidos</span>
+                  <button class="btn btn--secondary btn--small" data-action="abrirRelatorio">Abrir</button>
+                </li>
+                <li>
+                  <span>Desperdício</span>
+                  <button class="btn btn--secondary btn--small" data-action="abrirRelatorio">Abrir</button>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section
+          id="estoqueScreen"
+          class="screen"
+          role="tabpanel"
+          aria-labelledby="tab-estoque"
+          aria-label="Conferência"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <header class="section-header">
+            <div>
+              <h2>Conferir Itens Essenciais</h2>
+              <p class="text-muted">Estados sincronizados com estoque</p>
+            </div>
+            <button class="btn btn--secondary" data-action="notificarGerente">Notificar gerente</button>
+          </header>
+          <ul class="inventory-list">
+            <li class="inventory-item inventory-item--ok">
+              <span>Chopp Pilsen</span>
+              <span class="badge badge--green">OK</span>
+            </li>
+            <li class="inventory-item inventory-item--low">
+              <span>Limões Tahiti</span>
+              <span class="badge badge--amber">Baixo</span>
+            </li>
+            <li class="inventory-item inventory-item--alert">
+              <span>Ancho 300g</span>
+              <span class="badge badge--red">Falta</span>
+            </li>
+          </ul>
+        </section>
+
+        <section
+          id="comunicacaoScreen"
+          class="screen"
+          role="tabpanel"
+          aria-labelledby="tab-comunicacao"
+          aria-label="Comunicação"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <header class="section-header">
+            <div>
+              <h2>Avisos & Comunicação</h2>
+              <p class="text-muted">Templates rápidos por setor</p>
+            </div>
+            <button class="btn btn--secondary" data-action="novoAviso">Novo aviso</button>
+          </header>
+          <div class="grid grid--cards">
+            <article class="card card--notice card--success">
+              <header class="card__header">
+                <span class="badge badge--green">Cartão verde</span>
+                <time>18:42</time>
+              </header>
+              <p>Bar finalizou 100% no prazo. Excelente ritmo!</p>
+              <footer class="card__footer">Referência: Checklist Bar</footer>
+            </article>
+            <article class="card card--notice card--danger">
+              <header class="card__header">
+                <span class="badge badge--red">Cartão vermelho</span>
+                <time>19:05</time>
+              </header>
+              <p>Falta insumo: Ancho 300g – repor junto ao fornecedor.</p>
+              <footer class="card__footer">Referência: Praça de Carnes</footer>
+            </article>
+          </div>
+        </section>
+
+        <section
+          id="configScreen"
+          class="screen"
+          role="tabpanel"
+          aria-labelledby="tab-config"
+          aria-label="Configurações"
+          tabindex="0"
+          aria-hidden="true"
+        >
+          <header class="section-header">
+            <div>
+              <h2>Configurações</h2>
+              <p class="text-muted">Preferências do colaborador</p>
+            </div>
+          </header>
+          <form class="form-grid config-form">
+            <label class="form-field">
+              <span>Setor atual</span>
+              <select data-config="setor">
+                <option value="garcom">Garçom</option>
+                <option value="cozinha">Cozinha</option>
+                <option value="bar">Bar</option>
+                <option value="carnes">Carnes</option>
+                <option value="gerente">Gerente</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Tema alto contraste</span>
+              <input type="checkbox" data-config="altoContraste" />
+            </label>
+            <label class="form-field">
+              <span>Vibração</span>
+              <input type="checkbox" data-config="vibracao" />
+            </label>
+            <label class="form-field">
+              <span>Idioma</span>
+              <select data-config="idioma">
+                <option value="pt-BR">Português (Brasil)</option>
+                <option value="en-US">English</option>
+              </select>
+            </label>
+            <button class="btn btn--primary" type="button" data-action="salvarConfig">Salvar preferências</button>
+          </form>
+        </section>
+      </main>
+
+      <nav class="tab-bar" aria-label="Navegação principal" role="tablist">
+        <button
+          class="tab tab--active"
+          id="tab-dashboard"
+          data-screen="dashboardScreen"
+          role="tab"
+          aria-controls="dashboardScreen"
+          aria-selected="true"
+          tabindex="0"
+        >
+          <span class="tab__icon" aria-hidden="true">🏠</span>
+          <span class="tab__label">Início</span>
+        </button>
+        <button
+          class="tab"
+          id="tab-operacoes"
+          data-screen="operacoesScreen"
+          role="tab"
+          aria-controls="operacoesScreen"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          <span class="tab__icon" aria-hidden="true">🛠</span>
+          <span class="tab__label">Operações</span>
+        </button>
+        <button
+          class="tab"
+          id="tab-producao"
+          data-screen="producaoScreen"
+          role="tab"
+          aria-controls="producaoScreen"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          <span class="tab__icon" aria-hidden="true">🔥</span>
+          <span class="tab__label">Produção</span>
+        </button>
+        <button
+          class="tab"
+          id="tab-checklists"
+          data-screen="checklistsScreen"
+          role="tab"
+          aria-controls="checklistsScreen"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          <span class="tab__icon" aria-hidden="true">✅</span>
+          <span class="tab__label">Checklists</span>
+        </button>
+        <button
+          class="tab"
+          id="tab-gerente"
+          data-screen="gerenteScreen"
+          role="tab"
+          aria-controls="gerenteScreen"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          <span class="tab__icon" aria-hidden="true">🛡</span>
+          <span class="tab__label">Gerente</span>
+        </button>
+        <button
+          class="tab"
+          id="tab-estoque"
+          data-screen="estoqueScreen"
+          role="tab"
+          aria-controls="estoqueScreen"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          <span class="tab__icon" aria-hidden="true">📦</span>
+          <span class="tab__label">Conferência</span>
+        </button>
+        <button
+          class="tab"
+          id="tab-comunicacao"
+          data-screen="comunicacaoScreen"
+          role="tab"
+          aria-controls="comunicacaoScreen"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          <span class="tab__icon" aria-hidden="true">💬</span>
+          <span class="tab__label">Avisos</span>
+        </button>
+        <button
+          class="tab"
+          id="tab-config"
+          data-screen="configScreen"
+          role="tab"
+          aria-controls="configScreen"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          <span class="tab__icon" aria-hidden="true">⚙️</span>
+          <span class="tab__label">Config</span>
+        </button>
+      </nav>
+    </div>
+
+  <script src="scripts/firebase-config.js"></script>
+  <script src="scripts/firebase.js" type="module"></script>
+  <script src="scripts/offline-sync.js" type="module"></script>
+    <script src="scripts/app.js" type="module"></script>
+  </body>
+</html>
