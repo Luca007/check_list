@@ -209,8 +209,13 @@ function updatePlantaoBindings() {
     btn.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
 
-  selectors.plantaoBind?.textContent = appState.plantao;
-  selectors.plantaoLabel?.textContent = `Plantão ${appState.plantao}`;
+  if (selectors.plantaoBind) {
+    selectors.plantaoBind.textContent = appState.plantao;
+  }
+
+  if (selectors.plantaoLabel) {
+    selectors.plantaoLabel.textContent = `Plantão ${appState.plantao}`;
+  }
 }
 
 function markSectionCompleted(event) {
@@ -302,10 +307,13 @@ function handleProductionAction(event) {
 }
 
 function updateQty(node, value) {
-  if (node) {
-    node.textContent = value;
-    const parent = node.closest(".production-item");
-    parent?.querySelector("[data-bind='produzido']")?.textContent = value;
+  if (!node) return;
+
+  node.textContent = value;
+  const parent = node.closest(".production-item");
+  const producedNode = parent ? parent.querySelector("[data-bind='produzido']") : null;
+  if (producedNode) {
+    producedNode.textContent = value;
   }
 }
 
